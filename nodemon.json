@@ -1,0 +1,19 @@
+{
+  "watch": [
+    "controllers",
+    "modal",
+    "routes",
+    "utils",
+    "config",
+    "api",
+    "app.js",
+    "server.js",
+    ".env"
+  ],
+  "ignore": [
+    "frontend",
+    "node_modules",
+    ".git"
+  ],
+  "ext": "js,mjs,cjs,json"
+}
