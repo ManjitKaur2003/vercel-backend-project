@@ -39,7 +39,10 @@ const Signin = () => {
     setSuccess("");
 
     try {
-      await login(formData);
+      await login({
+        email: formData.email.trim(),
+        password: formData.password,
+      });
       setSuccess("Signed in successfully! Redirecting...");
       setTimeout(() => {
         navigate("/");
@@ -48,9 +51,15 @@ const Signin = () => {
       // Extract user-friendly error message from backend
       let errMsg = "Invalid email or password.";
       if (!err.response) {
-        errMsg = "Unable to connect to the backend server (http://localhost:5000). Please make sure your backend server is running.";
+        errMsg = "Unable to connect to the backend server. Please make sure your backend is running and CORS is configured.";
       } else if (err.response?.data?.message) {
         errMsg = err.response.data.message;
+      } else if (err.response?.data?.error?.message) {
+        errMsg = err.response.data.error.message;
+      } else if (typeof err.response?.data === "string" && err.response.data.length < 150) {
+        errMsg = err.response.data;
+      } else if (err.response?.status === 404) {
+        errMsg = `API endpoint not found (404). Check VITE_API_BASE_URL.`;
       }
       setError(errMsg);
     } finally {

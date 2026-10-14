@@ -6,9 +6,12 @@ export const signup = async (req, res, next) => {
   try {
     const { userName, email, password } = req.body;
     if (!userName || !email || !password) {
-      return res.status(400).json("All fields are required");
+      return res.status(400).json({ message: "All fields are required" });
     }
-    const isUserExist = await Auth.findOne({ email });
+    const cleanEmail = email.trim();
+    const isUserExist = await Auth.findOne({
+      email: { $regex: new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}$`, "i") },
+    });
     if (isUserExist) {
       return res.status(400).json({
         message: "Email is already exist",
@@ -16,8 +19,8 @@ export const signup = async (req, res, next) => {
     }
 
     const user = await Auth.create({
-      userName,
-      email,
+      userName: userName.trim(),
+      email: cleanEmail,
       password,
     });
     return res.status(201).json({
@@ -43,7 +46,10 @@ export const signin = async (req, res, next) => {
         message: "All fields are required",
       });
     }
-    const user = await Auth.findOne({ email });
+    const cleanEmail = email.trim();
+    const user = await Auth.findOne({
+      email: { $regex: new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\\]\\]/g, "\\$&")}$`, "i") },
+    });
     if (!user) {
       return res.status(400).json({
         message: "User Not Found",
